@@ -1,0 +1,1 @@
+import{W as a,n as o,X as n}from"./CCHEVW2i.js";import{u}from"./DukmIT0B.js";const d=a(async(i,f)=>{let e,t;const{token:r,fetchUser:s}=u();if(!r.value)return o("/login");if(!([e,t]=n(()=>s()),e=await e,t(),e))return o("/login")});export{d as default};

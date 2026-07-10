@@ -1,0 +1,9 @@
+{
+  "_hash": "ahMK7eRfHEL-Ol-4d05oSaRIn1MR7Iu6ppZSUEnnZWE",
+  "project": {
+    "rootDir": "/var/www/workspace/tr.test/frontend"
+  },
+  "versions": {
+    "nuxt": "4.4.8"
+  }
+}

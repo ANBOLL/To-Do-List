@@ -1,0 +1,403 @@
+import { ref, unref, mergeProps, computed, watch, useSSRContext } from 'vue';
+import { ssrRenderAttrs, ssrRenderComponent, ssrInterpolate, ssrIncludeBooleanAttr, ssrRenderAttr, ssrRenderList, ssrRenderClass, ssrLooseContain, ssrLooseEqual } from 'vue/server-renderer';
+import { _ as _export_sfc, b as useRuntimeConfig } from './server.mjs';
+import { u as useAuth } from './useAuth-D94ixnlA.mjs';
+import '../nitro/nitro.mjs';
+import 'node:http';
+import 'node:https';
+import 'node:events';
+import 'node:buffer';
+import 'node:fs';
+import 'node:path';
+import 'node:crypto';
+import 'node:url';
+import '../routes/renderer.mjs';
+import 'vue-bundle-renderer/runtime';
+import 'unhead/server';
+import 'devalue';
+import 'unhead/utils';
+import 'vue-router';
+
+const _sfc_main$4 = {
+  __name: "TaskFilters",
+  __ssrInlineRender: true,
+  props: {
+    search: String,
+    statusFilter: String,
+    sortBy: String
+  },
+  emits: ["update:search", "update:statusFilter", "update:sortBy"],
+  setup(__props) {
+    return (_ctx, _push, _parent, _attrs) => {
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "filters card" }, _attrs))} data-v-a87e04a7><div class="filter-row" data-v-a87e04a7><input${ssrRenderAttr("value", __props.search)} class="input" placeholder="Search by title..." data-v-a87e04a7><select${ssrRenderAttr("value", __props.statusFilter)} class="select" data-v-a87e04a7><option value="" data-v-a87e04a7>All Statuses</option><option value="pending" data-v-a87e04a7>Pending</option><option value="in_progress" data-v-a87e04a7>In Progress</option><option value="completed" data-v-a87e04a7>Completed</option></select><select${ssrRenderAttr("value", __props.sortBy)} class="select" data-v-a87e04a7><option value="" data-v-a87e04a7>Latest</option><option value="due_date" data-v-a87e04a7>Due Date</option><option value="status" data-v-a87e04a7>Status</option></select></div></div>`);
+    };
+  }
+};
+const _sfc_setup$4 = _sfc_main$4.setup;
+_sfc_main$4.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/TaskFilters.vue");
+  return _sfc_setup$4 ? _sfc_setup$4(props, ctx) : void 0;
+};
+const __nuxt_component_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["__scopeId", "data-v-a87e04a7"]]);
+const _sfc_main$3 = {
+  __name: "TaskItem",
+  __ssrInlineRender: true,
+  props: {
+    task: { type: Object, required: true },
+    currentUser: { type: Object, default: null }
+  },
+  emits: ["edit", "delete"],
+  setup(__props) {
+    const props = __props;
+    const statusLabel = computed(() => ({
+      pending: "Pending",
+      in_progress: "In Progress",
+      completed: "Completed"
+    })[props.task.status]);
+    const canModify = computed(() => {
+      if (!props.currentUser) return false;
+      if (props.currentUser.isAdmin) return true;
+      return props.currentUser.id === props.task.user_id;
+    });
+    return (_ctx, _push, _parent, _attrs) => {
+      _push(`<div${ssrRenderAttrs(mergeProps({
+        class: ["task-item card", { "task-completed": __props.task.status === "completed" }]
+      }, _attrs))} data-v-28a33808><div class="task-body" data-v-28a33808><div class="task-main" data-v-28a33808><h3 class="task-title" data-v-28a33808>${ssrInterpolate(__props.task.title)}</h3>`);
+      if (__props.task.description) {
+        _push(`<p class="task-desc" data-v-28a33808>${ssrInterpolate(__props.task.description)}</p>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div><div class="task-meta" data-v-28a33808><span class="${ssrRenderClass(["badge-" + __props.task.status, "badge"])}" data-v-28a33808>${ssrInterpolate(unref(statusLabel))}</span>`);
+      if (__props.task.due_date) {
+        _push(`<span class="task-date" data-v-28a33808>${ssrInterpolate(__props.task.due_date)}</span>`);
+      } else {
+        _push(`<!---->`);
+      }
+      if (__props.currentUser?.isAdmin && __props.task.user) {
+        _push(`<span class="task-owner" data-v-28a33808>${ssrInterpolate(__props.task.user.email)}</span>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div>`);
+      if (unref(canModify)) {
+        _push(`<div class="task-actions" data-v-28a33808><button class="btn btn-secondary btn-sm" data-v-28a33808>Edit</button><button class="btn btn-danger btn-sm" data-v-28a33808>Delete</button></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div></div>`);
+    };
+  }
+};
+const _sfc_setup$3 = _sfc_main$3.setup;
+_sfc_main$3.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/TaskItem.vue");
+  return _sfc_setup$3 ? _sfc_setup$3(props, ctx) : void 0;
+};
+const __nuxt_component_0 = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-28a33808"]]);
+const _sfc_main$2 = {
+  __name: "TaskList",
+  __ssrInlineRender: true,
+  props: {
+    tasks: { type: Array, default: () => [] },
+    loading: Boolean,
+    currentUser: Object
+  },
+  emits: ["edit", "delete"],
+  setup(__props) {
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_TaskItem = __nuxt_component_0;
+      _push(`<div${ssrRenderAttrs(_attrs)} data-v-95408fc7>`);
+      if (__props.loading) {
+        _push(`<div class="loading-state" data-v-95408fc7><div class="spinner" data-v-95408fc7></div><p data-v-95408fc7>Loading tasks...</p></div>`);
+      } else if (__props.tasks.length === 0) {
+        _push(`<div class="empty-state card" data-v-95408fc7><h3 data-v-95408fc7>No tasks yet</h3><p data-v-95408fc7>Create your first task to get started!</p></div>`);
+      } else {
+        _push(`<div class="task-list" data-v-95408fc7><!--[-->`);
+        ssrRenderList(__props.tasks, (task) => {
+          _push(ssrRenderComponent(_component_TaskItem, {
+            key: task.id,
+            task,
+            currentUser: __props.currentUser,
+            onEdit: ($event) => _ctx.$emit("edit", task),
+            onDelete: ($event) => _ctx.$emit("delete", task.id)
+          }, null, _parent));
+        });
+        _push(`<!--]--></div>`);
+      }
+      _push(`</div>`);
+    };
+  }
+};
+const _sfc_setup$2 = _sfc_main$2.setup;
+_sfc_main$2.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/TaskList.vue");
+  return _sfc_setup$2 ? _sfc_setup$2(props, ctx) : void 0;
+};
+const __nuxt_component_1 = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-95408fc7"]]);
+const _sfc_main$1 = {
+  __name: "TaskForm",
+  __ssrInlineRender: true,
+  props: {
+    task: { type: Object, default: null },
+    loading: { type: Boolean, default: false }
+  },
+  emits: ["submit", "cancel"],
+  setup(__props, { emit: __emit }) {
+    const props = __props;
+    const isEdit = computed(() => !!props.task);
+    const form = ref({
+      title: props.task?.title || "",
+      description: props.task?.description || "",
+      due_date: props.task?.due_date || "",
+      status: props.task?.status || "pending"
+    });
+    const errors = ref({});
+    watch(() => props.task, (val) => {
+      if (val) {
+        form.value = { title: val.title, description: val.description || "", due_date: val.due_date || "", status: val.status };
+      }
+    }, { immediate: true });
+    return (_ctx, _push, _parent, _attrs) => {
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "modal-overlay" }, _attrs))} data-v-1a3bdf9d><div class="modal card" data-v-1a3bdf9d><h3 data-v-1a3bdf9d>${ssrInterpolate(unref(isEdit) ? "Edit Task" : "New Task")}</h3><form class="form" data-v-1a3bdf9d><div class="field" data-v-1a3bdf9d><label data-v-1a3bdf9d>Title *</label><input${ssrRenderAttr("value", unref(form).title)} class="${ssrRenderClass([{ "input-error": unref(errors).title }, "input"])}" placeholder="Task title" required minlength="3" maxlength="255" data-v-1a3bdf9d>`);
+      if (unref(errors).title) {
+        _push(`<span class="field-error" data-v-1a3bdf9d>${ssrInterpolate(unref(errors).title)}</span>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div><div class="field" data-v-1a3bdf9d><label data-v-1a3bdf9d>Description</label><textarea class="input" rows="3" placeholder="Optional description" data-v-1a3bdf9d>${ssrInterpolate(unref(form).description)}</textarea></div><div class="field-row" data-v-1a3bdf9d><div class="field" data-v-1a3bdf9d><label data-v-1a3bdf9d>Due Date</label><input${ssrRenderAttr("value", unref(form).due_date)} type="date" class="input" data-v-1a3bdf9d></div><div class="field" data-v-1a3bdf9d><label data-v-1a3bdf9d>Status</label><select class="select" required data-v-1a3bdf9d><option value="pending" data-v-1a3bdf9d${ssrIncludeBooleanAttr(Array.isArray(unref(form).status) ? ssrLooseContain(unref(form).status, "pending") : ssrLooseEqual(unref(form).status, "pending")) ? " selected" : ""}>Pending</option><option value="in_progress" data-v-1a3bdf9d${ssrIncludeBooleanAttr(Array.isArray(unref(form).status) ? ssrLooseContain(unref(form).status, "in_progress") : ssrLooseEqual(unref(form).status, "in_progress")) ? " selected" : ""}>In Progress</option><option value="completed" data-v-1a3bdf9d${ssrIncludeBooleanAttr(Array.isArray(unref(form).status) ? ssrLooseContain(unref(form).status, "completed") : ssrLooseEqual(unref(form).status, "completed")) ? " selected" : ""}>Completed</option></select></div></div><div class="form-actions" data-v-1a3bdf9d><button type="button" class="btn btn-secondary" data-v-1a3bdf9d>Cancel</button><button type="submit" class="btn btn-primary"${ssrIncludeBooleanAttr(__props.loading) ? " disabled" : ""} data-v-1a3bdf9d>${ssrInterpolate(__props.loading ? "Saving..." : unref(isEdit) ? "Update" : "Create")}</button></div></form></div></div>`);
+    };
+  }
+};
+const _sfc_setup$1 = _sfc_main$1.setup;
+_sfc_main$1.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/TaskForm.vue");
+  return _sfc_setup$1 ? _sfc_setup$1(props, ctx) : void 0;
+};
+const __nuxt_component_2 = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-1a3bdf9d"]]);
+function useTasks() {
+  const config = useRuntimeConfig();
+  const tasks = ref([]);
+  const meta = ref({ total: 0, per_page: 10, current_page: 1, last_page: 1 });
+  const loading = ref(false);
+  const error = ref(null);
+  function getHeaders() {
+    return {};
+  }
+  function handleError(e) {
+    if (e?.response?.status === 401) {
+      const { logout } = useAuth();
+      logout();
+    }
+    return e.data?.message || e.message || "An error occurred";
+  }
+  async function fetchTasks(params = {}) {
+    loading.value = true;
+    error.value = null;
+    try {
+      const query = new URLSearchParams();
+      if (params.page) query.set("page", params.page);
+      if (params.per_page) query.set("per_page", params.per_page);
+      if (params.sort_by) query.set("sort_by", params.sort_by);
+      if (params.filter_by_status) query.set("filter_by_status", params.filter_by_status);
+      if (params.search) query.set("search", params.search);
+      const res = await $fetch(`${config.public.apiBase}/tasks?${query}`, {
+        headers: getHeaders()
+      });
+      tasks.value = res.data;
+      meta.value = res.meta;
+    } catch (e) {
+      error.value = handleError(e);
+    } finally {
+      loading.value = false;
+    }
+  }
+  async function createTask(data) {
+    error.value = null;
+    try {
+      const res = await $fetch(`${config.public.apiBase}/tasks`, {
+        method: "POST",
+        headers: getHeaders(),
+        body: data
+      });
+      return { success: true, task: res.data };
+    } catch (e) {
+      return { success: false, error: handleError(e) };
+    }
+  }
+  async function updateTask(id, data) {
+    error.value = null;
+    try {
+      const res = await $fetch(`${config.public.apiBase}/tasks/${id}`, {
+        method: "PUT",
+        headers: getHeaders(),
+        body: data
+      });
+      return { success: true, task: res.data };
+    } catch (e) {
+      return { success: false, error: handleError(e) };
+    }
+  }
+  async function deleteTask(id) {
+    error.value = null;
+    try {
+      await $fetch(`${config.public.apiBase}/tasks/${id}`, {
+        method: "DELETE",
+        headers: getHeaders()
+      });
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: handleError(e) };
+    }
+  }
+  return { tasks, meta, loading, error, fetchTasks, createTask, updateTask, deleteTask };
+}
+const _sfc_main = {
+  __name: "dashboard",
+  __ssrInlineRender: true,
+  setup(__props) {
+    const { user } = useAuth();
+    const {
+      tasks,
+      meta,
+      loading,
+      error: tasksError,
+      fetchTasks,
+      createTask,
+      updateTask,
+      deleteTask
+    } = useTasks();
+    const search = ref("");
+    const statusFilter = ref("");
+    const sortBy = ref("");
+    const showCreateForm = ref(false);
+    const editingTask = ref(null);
+    const formLoading = ref(false);
+    let searchTimeout = null;
+    async function loadTasks() {
+      const params = {
+        page: meta.value.current_page,
+        per_page: meta.value.per_page,
+        sort_by: sortBy.value || void 0,
+        filter_by_status: statusFilter.value || void 0,
+        search: search.value || void 0
+      };
+      await fetchTasks(params);
+    }
+    function onSearch(val) {
+      search.value = val;
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        meta.value.current_page = 1;
+        loadTasks();
+      }, 400);
+    }
+    function onStatusFilter(val) {
+      statusFilter.value = val;
+      meta.value.current_page = 1;
+      loadTasks();
+    }
+    function onSortBy(val) {
+      sortBy.value = val;
+      loadTasks();
+    }
+    async function handleCreate(data) {
+      formLoading.value = true;
+      const result = await createTask(data);
+      formLoading.value = false;
+      if (result.success) {
+        showCreateForm.value = false;
+        await loadTasks();
+      } else {
+        alert(result.error);
+      }
+    }
+    function openEdit(task) {
+      editingTask.value = { ...task };
+    }
+    async function handleUpdate(data) {
+      formLoading.value = true;
+      const result = await updateTask(editingTask.value.id, data);
+      formLoading.value = false;
+      if (result.success) {
+        editingTask.value = null;
+        await loadTasks();
+      } else {
+        alert(result.error);
+      }
+    }
+    async function handleDelete(id) {
+      if (!confirm("Are you sure you want to delete this task?")) return;
+      const result = await deleteTask(id);
+      if (result.success) {
+        await loadTasks();
+      } else {
+        alert(result.error);
+      }
+    }
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_TaskFilters = __nuxt_component_0$1;
+      const _component_TaskList = __nuxt_component_1;
+      const _component_TaskForm = __nuxt_component_2;
+      _push(`<div${ssrRenderAttrs(_attrs)} data-v-1324be07><div class="dashboard-header" data-v-1324be07><h2 data-v-1324be07>My Tasks</h2><button class="btn btn-primary" data-v-1324be07>+ New Task</button></div>`);
+      _push(ssrRenderComponent(_component_TaskFilters, {
+        search: unref(search),
+        statusFilter: unref(statusFilter),
+        "onUpdate:search": onSearch,
+        "onUpdate:statusFilter": onStatusFilter,
+        "onUpdate:sortBy": onSortBy
+      }, null, _parent));
+      if (unref(tasksError)) {
+        _push(`<div class="error-state" data-v-1324be07>${ssrInterpolate(unref(tasksError))}</div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(ssrRenderComponent(_component_TaskList, {
+        tasks: unref(tasks),
+        loading: unref(loading),
+        currentUser: unref(user),
+        onEdit: openEdit,
+        onDelete: handleDelete
+      }, null, _parent));
+      if (unref(meta).total > 0) {
+        _push(`<div class="pagination" data-v-1324be07><span class="page-info" data-v-1324be07>${ssrInterpolate(unref(meta).total)} tasks (page ${ssrInterpolate(unref(meta).current_page)} of ${ssrInterpolate(unref(meta).last_page)})</span><div class="page-btns" data-v-1324be07><button class="btn btn-secondary"${ssrIncludeBooleanAttr(unref(meta).current_page <= 1) ? " disabled" : ""} data-v-1324be07>Previous</button><button class="btn btn-secondary"${ssrIncludeBooleanAttr(unref(meta).current_page >= unref(meta).last_page) ? " disabled" : ""} data-v-1324be07>Next</button></div></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      if (unref(showCreateForm)) {
+        _push(ssrRenderComponent(_component_TaskForm, {
+          loading: unref(formLoading),
+          onSubmit: handleCreate,
+          onCancel: ($event) => showCreateForm.value = false
+        }, null, _parent));
+      } else {
+        _push(`<!---->`);
+      }
+      if (unref(editingTask)) {
+        _push(ssrRenderComponent(_component_TaskForm, {
+          task: unref(editingTask),
+          loading: unref(formLoading),
+          onSubmit: handleUpdate,
+          onCancel: ($event) => editingTask.value = null
+        }, null, _parent));
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div>`);
+    };
+  }
+};
+const _sfc_setup = _sfc_main.setup;
+_sfc_main.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("pages/dashboard.vue");
+  return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
+};
+const dashboard = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-1324be07"]]);
+
+export { dashboard as default };
+//# sourceMappingURL=dashboard-BjDs6Ru3.mjs.map
