@@ -20,4 +20,16 @@ class TaskUpdateRequest extends FormRequest
 			'status' => 'sometimes|required|in:pending,in_progress,completed',
 		];
 	}
+
+	public function messages(): array
+	{
+		return [
+			'title.required' => 'Название обязательно для заполнения.',
+			'title.min' => 'Название должно содержать минимум 3 символа.',
+			'title.max' => 'Название должно быть не более 255 символов.',
+			'due_date.date' => 'Введите корректную дату.',
+			'status.required' => 'Статус обязателен для заполнения.',
+			'status.in' => 'Выбран недопустимый статус.',
+		];
+	}
 }

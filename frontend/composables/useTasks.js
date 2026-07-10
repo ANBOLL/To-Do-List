@@ -1,5 +1,6 @@
 export function useTasks() {
 	const config = useRuntimeConfig()
+	const { logout } = useAuth()
 	const tasks = ref([])
 	const meta = ref({ total: 0, per_page: 10, current_page: 1, last_page: 1 })
 	const loading = ref(false)
@@ -12,7 +13,6 @@ export function useTasks() {
 
 	function handleError(e) {
 		if (e?.response?.status === 401) {
-			const { logout } = useAuth()
 			logout()
 		}
 		return e.data?.message || e.message || 'An error occurred'
@@ -26,6 +26,7 @@ export function useTasks() {
 			if (params.page) query.set('page', params.page)
 			if (params.per_page) query.set('per_page', params.per_page)
 			if (params.sort_by) query.set('sort_by', params.sort_by)
+			if (params.sort_direction) query.set('sort_direction', params.sort_direction)
 			if (params.filter_by_status) query.set('filter_by_status', params.filter_by_status)
 			if (params.search) query.set('search', params.search)
 			if (params.owner_filter) query.set('owner_filter', params.owner_filter)

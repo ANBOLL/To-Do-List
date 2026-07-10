@@ -5,8 +5,10 @@
 				@input="$emit('update:search', $event.target.value)" />
 			<AppSelect :modelValue="statusFilter" :options="statusOptions"
 				@update:modelValue="$emit('update:statusFilter', $event)" />
-			<AppSelect :modelValue="sortBy" :options="sortOptions"
+			<AppSelect :modelValue="sortBy" :options="sortFieldOptions"
 				@update:modelValue="$emit('update:sortBy', $event)" />
+			<AppSelect v-if="sortBy" :modelValue="sortDirection" :options="sortDirectionOptions"
+				@update:modelValue="$emit('update:sortDirection', $event)" />
 			<AppSelect v-if="isAdmin" :modelValue="ownerFilter" :options="ownerOptions"
 				@update:modelValue="$emit('update:ownerFilter', $event)" />
 			<button class="btn btn--secondary" @click="$emit('reset')">Сбросить</button>
@@ -19,11 +21,12 @@ defineProps({
 	search: String,
 	statusFilter: String,
 	sortBy: String,
+	sortDirection: String,
 	ownerFilter: String,
 	isAdmin: Boolean,
 })
 
-defineEmits(['update:search', 'update:statusFilter', 'update:sortBy', 'update:ownerFilter', 'reset'])
+defineEmits(['update:search', 'update:statusFilter', 'update:sortBy', 'update:sortDirection', 'update:ownerFilter', 'reset'])
 
 const statusOptions = [
 	{ value: '', label: 'Все статусы' },
@@ -32,10 +35,16 @@ const statusOptions = [
 	{ value: 'completed', label: 'Завершена' },
 ]
 
-const sortOptions = [
+const sortFieldOptions = [
 	{ value: '', label: 'Новые' },
+	{ value: 'created_at', label: 'По дате' },
 	{ value: 'due_date', label: 'По сроку' },
 	{ value: 'status', label: 'По статусу' },
+]
+
+const sortDirectionOptions = [
+	{ value: 'asc', label: 'По возрастанию' },
+	{ value: 'desc', label: 'По убыванию' },
 ]
 
 const ownerOptions = [

@@ -21,6 +21,7 @@
 - [Auth-подход](#auth-подход)
 - [Структура проекта](#структура-проекта)
 - [Тестирование](#тестирование)
+- [Админ-панель (MoonShine)](#админ-панель-moonshine)
 - [Дополнительные возможности](#дополнительные-возможности)
 
 ---
@@ -203,10 +204,11 @@ todo-list/
 │   │   ├── Exceptions/             # Обработка ошибок (401, 403, 404, 422, 500)
 │   │   ├── Http/
 │   │   │   ├── Controllers/Api/    # AuthController, TaskController
-│   │   │   └── Requests/           # TaskStoreRequest, TaskUpdateRequest
+│   │   │   └── Requests/           # LoginRequest, TaskStoreRequest, TaskUpdateRequest, UpdateUserRequest
 │   │   ├── Models/                 # User, Task
 │   │   ├── Policies/               # TaskPolicy (owner/admin)
-│   │   └── Providers/              # AppServiceProvider
+│   │   ├── Providers/              # AppServiceProvider, MoonShineServiceProvider
+│   │   └── Enums/                  # TaskStatus, UserRole
 │   ├── config/                     # moonshine.php, auth.php, sanctum.php
 │   ├── database/
 │   │   ├── factories/              # UserFactory, TaskFactory
@@ -217,9 +219,12 @@ todo-list/
 │   │   └── api.php                 # 8 endpoints
 │   ├── public/
 │   │   └── swagger.json            # OpenAPI 3.0 спецификация
-│   └── tests/Feature/              # ApiTest (16 тестов)
+│   ├── tests/Feature/              # ApiTest (16 тестов)
+│   └── Dockerfile
 │
 ├── frontend/                       # Nuxt 4 SPA
+│   ├── app.vue                     # Корневой компонент
+│   ├── nuxt.config.ts              # Конфигурация Nuxt
 │   ├── assets/css/                 # main.css (глобальные стили, BEM, responsive)
 │   ├── components/
 │   │   ├── AppSelect.vue           # Кастомный селект с BEM
@@ -240,20 +245,17 @@ todo-list/
 │   ├── pages/
 │   │   ├── [...slug].vue           # 404 catch-all
 │   │   ├── dashboard.vue           # Главная страница с задачами
-│   │   ├── error.vue               # Глобальная страница ошибки (404)
+│   │   ├── error.vue               # Глобальная страница ошибки
 │   │   ├── index.vue               # Редирект на /login
 │   │   └── login.vue               # Страница входа
-│   ├── plugins/
-│   │   └── pwa.client.ts           # Регистрация Service Worker
 │   ├── public/
 │   │   ├── favicon.svg             # Фавиконка
-│   │   ├── icons/icon.svg          # PWA иконка 512×512
-│   │   ├── manifest.json           # PWA манифест
-│   │   └── sw.js                   # Service Worker (NetworkFirst для API)
-│   └── tests/                      # 16 тестов
-│       ├── auth.test.ts
-│       ├── task-form.test.ts
-│       └── task-item.test.ts
+│   │   └── icons/icon.svg          # Иконка
+│   ├── tests/                      # 16 тестов
+│   │   ├── auth.test.ts
+│   │   ├── task-form.test.ts
+│   │   └── task-item.test.ts
+│   └── Dockerfile
 │
 ├── docker-compose.yml
 └── README.md
@@ -283,6 +285,27 @@ npm run test
 
 ---
 
+## Админ-панель (MoonShine)
+
+На проекте доступна админ-панель на базе **MoonShine**.
+
+- **URL**: http://localhost:8000/admin
+- **Язык интерфейса**: русский
+- **Управление**: пользователи (приложения), задачи, администраторы, роли
+
+MoonShine использует отдельную таблицу администраторов `moonshine_users`, не связанную с обычными пользователями приложения.
+
+### Создание администратора
+
+```bash
+cd backend
+php artisan moonshine:user
+```
+
+Команда интерактивно запросит email, имя и пароль. После создания вы сможете войти в админ-панель по адресу `/admin`.
+
+---
+
 ## Дополнительные возможности
 
 ### Реализовано
@@ -303,6 +326,7 @@ npm run test
 - [x] Кастомные скроллы
 - [x] Русские сообщения валидации и ошибок API
 - [x] Анимации (модалки, тултипы статуса, hover-эффекты)
+- [x] Админ-панель MoonShine (управление пользователями, задачами, администраторами)
 
 
 

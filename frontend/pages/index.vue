@@ -3,5 +3,5 @@
 </template>
 
 <script setup>
-navigateTo('/login', { redirectCode: 301 })
+navigateTo('/login', { redirectCode: 302 })
 </script>

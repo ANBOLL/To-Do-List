@@ -13,7 +13,8 @@ class TaskController extends Controller
 {
 	public function index(Request $request): JsonResponse
 	{
-		$query = Task::with('user:id,email');
+		$userFields = $request->user()->isAdmin() ? 'user:id,email,name' : 'user:id,email';
+		$query = Task::with($userFields);
 
 		if (!$request->user()->isAdmin()) {
 			$query->where('user_id', $request->user()->id);
@@ -35,8 +36,20 @@ class TaskController extends Controller
 			$query->where('status', $request->filter_by_status);
 		}
 
-		if ($request->filled('sort_by') && in_array($request->sort_by, ['due_date', 'status'])) {
-			$query->orderBy($request->sort_by);
+		$sortBy = $request->input('sort_by');
+		$sortDir = $request->input('sort_direction', 'asc');
+		$sortDir = in_array($sortDir, ['asc', 'desc']) ? $sortDir : 'asc';
+
+		if ($sortBy && in_array($sortBy, ['created_at', 'due_date', 'status'])) {
+			if ($sortBy === 'due_date') {
+				$query->orderByRaw('CASE WHEN due_date IS NULL THEN 1 ELSE 0 END')
+					->orderBy('due_date', $sortDir);
+			} elseif ($sortBy === 'status') {
+				$dir = $sortDir === 'asc' ? 'ASC' : 'DESC';
+				$query->orderByRaw("CASE status WHEN 'pending' THEN 1 WHEN 'in_progress' THEN 2 WHEN 'completed' THEN 3 END $dir");
+			} else {
+				$query->orderBy($sortBy, $sortDir);
+			}
 		} else {
 			$query->latest();
 		}
@@ -90,6 +103,9 @@ class TaskController extends Controller
 
 		$task->delete();
 
-		return response()->json(['message' => 'Task deleted successfully.']);
+		return response()->json([
+			'data' => null,
+			'message' => 'Задача удалена.',
+		]);
 	}
 }

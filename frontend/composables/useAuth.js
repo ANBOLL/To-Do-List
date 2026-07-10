@@ -23,10 +23,10 @@ export function useAuth() {
 				method: 'POST',
 				body: { email, password },
 			})
-			token.value = res.token
-			user.value = res.user
+			token.value = res.data.token
+			user.value = res.data.user
 			if (process.client) {
-				localStorage.setItem('token', res.token)
+				localStorage.setItem('token', res.data.token)
 			}
 			return true
 		} catch (e) {
@@ -43,8 +43,8 @@ export function useAuth() {
 			const res = await $fetch(`${config.public.apiBase}/user`, {
 				headers: { Authorization: `Bearer ${token.value}` },
 			})
-			user.value = res.user
-			return res.user
+			user.value = res.data
+			return res.data
 		} catch {
 			logout()
 			return null
@@ -59,7 +59,7 @@ export function useAuth() {
 				headers: { Authorization: `Bearer ${token.value}` },
 				body: data,
 			})
-			user.value = res.user
+			user.value = res.data
 			return { success: true, message: res.message }
 		} catch (e) {
 			const msg = e.data?.errors

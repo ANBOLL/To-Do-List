@@ -34,7 +34,7 @@ class ApiTest extends TestCase
 			'password' => 'password',
 		]);
 
-		$response->assertOk()->assertJsonStructure(['token', 'user']);
+		$response->assertOk()->assertJsonStructure(['data' => ['token', 'user']]);
 	}
 
 	public function test_login_fails_with_invalid_credentials(): void

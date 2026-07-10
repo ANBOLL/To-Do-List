@@ -15,9 +15,10 @@
 			</button>
 		</div>
 
-		<TaskFilters :search="search" :statusFilter="statusFilter" :sortBy="sortBy" :ownerFilter="ownerFilter"
-			:isAdmin="user?.is_admin" @update:search="onSearch" @update:statusFilter="onStatusFilter"
-			@update:sortBy="onSortBy" @update:ownerFilter="onOwnerFilter" @reset="resetFilters" />
+		<TaskFilters :search="search" :statusFilter="statusFilter" :sortBy="sortBy" :sortDirection="sortDirection"
+			:ownerFilter="ownerFilter" :isAdmin="user?.is_admin" @update:search="onSearch"
+			@update:statusFilter="onStatusFilter" @update:sortBy="onSortBy" @update:sortDirection="onSortDirection"
+			@update:ownerFilter="onOwnerFilter" @reset="resetFilters" />
 
 		<Transition name="fade">
 			<div v-if="tasksError" class="state-error">
@@ -84,7 +85,10 @@ const router = useRouter()
 const search = ref(route.query.search || '')
 const statusFilter = ref(route.query.filter_by_status || '')
 const sortBy = ref(route.query.sort_by || '')
+const sortDirection = ref(route.query.sort_direction || 'asc')
 const ownerFilter = ref(route.query.owner_filter || '')
+const pageFromUrl = Number(route.query.page) || 1
+meta.value.current_page = pageFromUrl
 const showCreateForm = ref(false)
 const editingTask = ref(null)
 const formLoading = ref(false)
@@ -99,6 +103,7 @@ function syncQuery(params) {
 	if (params.search) query.search = params.search
 	if (params.filter_by_status) query.filter_by_status = params.filter_by_status
 	if (params.sort_by) query.sort_by = params.sort_by
+	if (params.sort_direction && params.sort_direction !== 'asc') query.sort_direction = params.sort_direction
 	if (params.owner_filter) query.owner_filter = params.owner_filter
 	if (params.page > 1) query.page = params.page
 
@@ -110,6 +115,7 @@ async function loadTasks() {
 		page: meta.value.current_page,
 		per_page: meta.value.per_page,
 		sort_by: sortBy.value || undefined,
+		sort_direction: sortBy.value ? (sortDirection.value || 'asc') : undefined,
 		filter_by_status: statusFilter.value || undefined,
 		search: search.value || undefined,
 		owner_filter: ownerFilter.value || undefined,
@@ -136,6 +142,12 @@ function onStatusFilter(val) {
 
 function onSortBy(val) {
 	sortBy.value = val
+	meta.value.current_page = 1
+	loadTasks()
+}
+
+function onSortDirection(val) {
+	sortDirection.value = val
 	loadTasks()
 }
 
@@ -149,6 +161,7 @@ function resetFilters() {
 	search.value = ''
 	statusFilter.value = ''
 	sortBy.value = ''
+	sortDirection.value = 'asc'
 	ownerFilter.value = ''
 	meta.value.current_page = 1
 	router.replace({ query: {} })

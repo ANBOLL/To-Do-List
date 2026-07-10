@@ -125,10 +125,10 @@ class Dashboard extends Page
 						->preview(),
 
 					Divider::make('Быстрые действия'),
-					ActionButton::make('Создать задачу', '/admin/resource/task-resource/form-page')
+					ActionButton::make('Создать задачу', '/admin/resource/task-resource/task-form-page')
 						->primary()
 						->icon('plus'),
-					ActionButton::make('Создать пользователя', '/admin/resource/user-resource/form-page')
+					ActionButton::make('Создать пользователя', '/admin/resource/user-resource/user-form-page')
 						->secondary()
 						->icon('plus'),
 				])->columnSpan(12),

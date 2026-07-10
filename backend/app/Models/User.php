@@ -36,6 +36,11 @@ class User extends Authenticatable
 
 	public function getIsAdminAttribute(): bool
 	{
+		return $this->isAdmin();
+	}
+
+	public function isAdmin(): bool
+	{
 		return $this->role === 'admin';
 	}
 
@@ -47,10 +52,5 @@ class User extends Authenticatable
 	public function tasks()
 	{
 		return $this->hasMany(Task::class);
-	}
-
-	public function isAdmin(): bool
-	{
-		return $this->role === 'admin';
 	}
 }

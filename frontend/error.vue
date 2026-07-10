@@ -6,7 +6,7 @@
 			<div class="b-error-page__shape b-error-page__shape--3" />
 		</div>
 		<div class="b-error-page__card card">
-			<div class="b-error-page__code">404</div>
+			<div class="b-error-page__code">{{ error.statusCode || 404 }}</div>
 			<div class="b-error-page__icon">
 				<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"
 					stroke-linecap="round" stroke-linejoin="round">
@@ -16,10 +16,8 @@
 					<line x1="15" y1="9" x2="15.01" y2="9" />
 				</svg>
 			</div>
-			<h1 class="b-error-page__title">Страница не найдена</h1>
-			<p class="b-error-page__text">
-				Возможно, она была удалена или вы перешли по неверной ссылке.
-			</p>
+			<h1 class="b-error-page__title">{{ title }}</h1>
+			<p class="b-error-page__text">{{ message }}</p>
 			<div class="b-error-page__actions">
 				<button class="btn btn--primary b-error-page__btn" @click="goHome">
 					<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -43,13 +41,26 @@
 <script setup>
 definePageMeta({ layout: false })
 
+const error = useError()
 const router = useRouter()
 
+const statusMap = {
+	403: { title: 'Доступ запрещён', message: 'У вас нет прав для просмотра этой страницы.' },
+	404: { title: 'Страница не найдена', message: 'Возможно, она была удалена или вы перешли по неверной ссылке.' },
+	500: { title: 'Ошибка сервера', message: 'Произошла внутренняя ошибка. Попробуйте обновить страницу позже.' },
+}
+
+const statusCode = error.value?.statusCode || 404
+const page = statusMap[statusCode] || statusMap[500]
+const title = page.title
+const message = page.message
+
 function goHome() {
-	router.push('/dashboard')
+	clearError({ redirect: '/dashboard' })
 }
 
 function goBack() {
+	clearError()
 	router.back()
 }
 </script>
