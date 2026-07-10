@@ -15,14 +15,14 @@ use MoonShine\UI\Fields\Text;
  */
 final class MoonShineUserRoleIndexPage extends IndexPage
 {
-    /**
-     * @return list<FieldContract>
-     */
-    protected function fields(): iterable
-    {
-        return [
-            ID::make()->sortable(),
-            Text::make(__('moonshine::ui.resource.role_name'), 'name'),
-        ];
-    }
+	/**
+	 * @return list<FieldContract>
+	 */
+	protected function fields(): iterable
+	{
+		return [
+			ID::make()->sortable(),
+			Text::make(__('moonshine::ui.resource.role_name'), 'name'),
+		];
+	}
 }

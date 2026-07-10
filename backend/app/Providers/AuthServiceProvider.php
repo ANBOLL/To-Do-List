@@ -8,12 +8,12 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 
 class AuthServiceProvider extends ServiceProvider
 {
-    protected $policies = [
-        Task::class => TaskPolicy::class,
-    ];
+	protected $policies = [
+		Task::class => TaskPolicy::class,
+	];
 
-    public function boot(): void
-    {
-        $this->registerPolicies();
-    }
+	public function boot(): void
+	{
+		$this->registerPolicies();
+	}
 }

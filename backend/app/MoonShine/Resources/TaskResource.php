@@ -17,32 +17,32 @@ use MoonShine\Support\Attributes\Icon;
 #[Order(2)]
 class TaskResource extends ModelResource
 {
-    protected string $model = Task::class;
+	protected string $model = Task::class;
 
-    protected string $column = 'title';
+	protected string $column = 'title';
 
-    protected int $itemsPerPage = 15;
+	protected int $itemsPerPage = 15;
 
-    protected array $perPageOptions = [15, 25, 50];
+	protected array $perPageOptions = [15, 25, 50];
 
-    public function getTitle(): string
-    {
-        return 'Задачи';
-    }
+	public function getTitle(): string
+	{
+		return 'Задачи';
+	}
 
-    protected function pages(): array
-    {
-        return [
-            TaskIndexPage::class,
-            TaskFormPage::class,
-        ];
-    }
+	protected function pages(): array
+	{
+		return [
+			TaskIndexPage::class,
+			TaskFormPage::class,
+		];
+	}
 
-    protected function search(): array
-    {
-        return [
-            'title',
-            'description',
-        ];
-    }
+	protected function search(): array
+	{
+		return [
+			'title',
+			'description',
+		];
+	}
 }

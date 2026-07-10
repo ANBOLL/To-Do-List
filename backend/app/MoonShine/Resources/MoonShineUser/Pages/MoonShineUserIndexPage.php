@@ -25,57 +25,57 @@ use MoonShine\UI\Fields\Text;
  */
 final class MoonShineUserIndexPage extends IndexPage
 {
-    /**
-     * @return list<FieldContract>
-     */
-    protected function fields(): iterable
-    {
-        return [
-            ID::make()->sortable(),
+	/**
+	 * @return list<FieldContract>
+	 */
+	protected function fields(): iterable
+	{
+		return [
+			ID::make()->sortable(),
 
-            BelongsTo::make(
-                __('moonshine::ui.resource.role'),
-                'moonshineUserRole',
-                formatted: static fn (MoonshineUserRole $model) => $model->name,
-                resource: MoonShineUserRoleResource::class,
-            )->badge(Color::PURPLE),
+			BelongsTo::make(
+				__('moonshine::ui.resource.role'),
+				'moonshineUserRole',
+				formatted: static fn(MoonshineUserRole $model) => $model->name,
+				resource: MoonShineUserRoleResource::class,
+			)->badge(Color::PURPLE),
 
-            Text::make(__('moonshine::ui.resource.name'), 'name'),
+			Text::make(__('moonshine::ui.resource.name'), 'name'),
 
-            Image::make(__('moonshine::ui.resource.avatar'), 'avatar')->modifyRawValue(fn (
-                ?string $raw
-            ): string => $raw ?? ''),
+			Image::make(__('moonshine::ui.resource.avatar'), 'avatar')->modifyRawValue(fn(
+				?string $raw
+			): string => $raw ?? ''),
 
-            Date::make(__('moonshine::ui.resource.created_at'), 'created_at')
-                ->format("d.m.Y")
-                ->sortable(),
+			Date::make(__('moonshine::ui.resource.created_at'), 'created_at')
+				->format("d.m.Y")
+				->sortable(),
 
-            Email::make(__('moonshine::ui.resource.email'), 'email')
-                ->sortable(),
-        ];
-    }
+			Email::make(__('moonshine::ui.resource.email'), 'email')
+				->sortable(),
+		];
+	}
 
-    protected function filters(): iterable
-    {
-        return [
-            BelongsTo::make(
-                __('moonshine::ui.resource.role'),
-                'moonshineUserRole',
-                formatted: static fn (MoonshineUserRole $model) => $model->name,
-                resource: MoonShineUserRoleResource::class,
-            )->valuesQuery(static fn (Builder $q) => $q->select(['id', 'name'])),
+	protected function filters(): iterable
+	{
+		return [
+			BelongsTo::make(
+				__('moonshine::ui.resource.role'),
+				'moonshineUserRole',
+				formatted: static fn(MoonshineUserRole $model) => $model->name,
+				resource: MoonShineUserRoleResource::class,
+			)->valuesQuery(static fn(Builder $q) => $q->select(['id', 'name'])),
 
-            Email::make('E-mail', 'email'),
-        ];
-    }
+			Email::make('E-mail', 'email'),
+		];
+	}
 
-    /**
-     * @param  TableBuilder  $component
-     *
-     * @return TableBuilder
-     */
-    protected function modifyListComponent(ComponentContract $component): TableBuilder
-    {
-        return $component->columnSelection();
-    }
+	/**
+	 * @param  TableBuilder  $component
+	 *
+	 * @return TableBuilder
+	 */
+	protected function modifyListComponent(ComponentContract $component): TableBuilder
+	{
+		return $component->columnSelection();
+	}
 }

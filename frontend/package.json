@@ -5,10 +5,16 @@
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build",
-    "start": "nuxt preview"
+    "start": "nuxt preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "nuxt": "^4.4.8"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@nuxt/test-utils": "^4.0.3",
+    "@vue/test-utils": "^2.4.11",
+    "happy-dom": "^20.10.6",
+    "vitest": "^4.1.10"
+  }
 }

@@ -17,32 +17,32 @@ use MoonShine\Support\Attributes\Icon;
 #[Order(1)]
 class UserResource extends ModelResource
 {
-    protected string $model = User::class;
+	protected string $model = User::class;
 
-    protected string $column = 'name';
+	protected string $column = 'name';
 
-    protected int $itemsPerPage = 15;
+	protected int $itemsPerPage = 15;
 
-    protected array $perPageOptions = [15, 25, 50];
+	protected array $perPageOptions = [15, 25, 50];
 
-    public function getTitle(): string
-    {
-        return 'Пользователи';
-    }
+	public function getTitle(): string
+	{
+		return 'Пользователи';
+	}
 
-    protected function pages(): array
-    {
-        return [
-            UserIndexPage::class,
-            UserFormPage::class,
-        ];
-    }
+	protected function pages(): array
+	{
+		return [
+			UserIndexPage::class,
+			UserFormPage::class,
+		];
+	}
 
-    protected function search(): array
-    {
-        return [
-            'name',
-            'email',
-        ];
-    }
+	protected function search(): array
+	{
+		return [
+			'name',
+			'email',
+		];
+	}
 }

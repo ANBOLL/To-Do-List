@@ -1,101 +1,315 @@
-# Todo App
+<div align="center">
+  <br>
+  <img src="frontend/public/icons/icon.svg" width="80" height="80" alt="To-Do List">
+  <h1 align="center">To-Do List</h1>
+  <p align="center">Fullstack-приложение для управления задачами</p>
+  <p align="center">
+    Laravel + Nuxt 4 + Sanctum + SQLite
+  </p>
+  <br>
+</div>
 
-Full-stack Todo List приложение с авторизацией, REST API, SPA фронтендом (Nuxt 4) и админ-панелью MoonShine.
+## Содержание
 
-## Архитектура
+- [О проекте](#о-проекте)
+- [Стек технологий](#стек-технологий)
+- [Быстрый старт](#быстрый-старт)
+- [Тестовые пользователи](#тестовые-пользователи)
+- [Docker](#docker)
+- [API Endpoints](#api-endpoints)
+- [Swagger](#swagger)
+- [Auth-подход](#auth-подход)
+- [Структура проекта](#структура-проекта)
+- [Тестирование](#тестирование)
+- [Дополнительные возможности](#дополнительные-возможности)
 
-- **Backend:** Laravel 13 + REST API (Sanctum token-based auth)
-- **Frontend:** Nuxt 4 SPA (Vue 3 Composition API)
-- **Admin Panel:** MoonShine 4
-- **Database:** MySQL
+---
+
+## О проекте
+
+Мини-приложение «Список задач» с авторизацией, CRUD-операциями и клиентской частью на Nuxt 4.
+
+- **Laravel** — данные, авторизация, бизнес-правила, REST API
+- **Nuxt 4** — интерфейс, взаимодействие с API, роутинг
+
+---
+
+## Стек технологий
+
+| Компонент | Технология |
+|---|---|
+| **Backend** | Laravel 11, PHP 8.3+, Eloquent ORM |
+| **Frontend** | Nuxt 4, Vue 3 Composition API, Vite |
+| **База данных** | SQLite (по умолчанию) / MySQL |
+| **Авторизация** | Laravel Sanctum (Bearer Token) |
+| **Валидация** | Form Request |
+| **Стили** | BEM-методология, CSS-переменные, responsive (4 брейкпоинта) |
+
+---
 
 ## Быстрый старт
 
-```bash
-# Backend
-cd backend
-vcomposer install
-cp .env.example .env
-# отредактировать .env (БД, URL)
-vphp artisan key:generate
-vphp artisan migrate --seed
-vphp artisan serve
+### 1. Backend
 
-# Frontend (отдельный терминал)
+```bash
+cd backend
+
+# Установка зависимостей
+composer install
+
+# Настройка окружения
+cp .env.example .env
+php artisan key:generate
+
+# База данных (SQLite — по умолчанию)
+# Файл БД создаётся автоматически при миграции
+
+# Миграции + сиды (тестовые пользователи + задачи)
+php artisan migrate --seed
+
+# Запуск сервера
+php artisan serve
+```
+
+Backend будет доступен на **http://localhost:8000**.
+
+### 2. Frontend
+
+```bash
 cd frontend
+
+# Установка зависимостей
 npm install
+
+# Запуск dev-сервера
 npm run dev
 ```
 
-## Установка MoonShine
+Frontend будет доступен на **http://localhost:5173**.
 
-```bash
-cd backend
-vcomposer require moonshine/moonshine
-vcomposer require moonshine/ru
-vphp artisan moonshine:install
-vphp artisan moonshine:user  # создать админа для панели
-```
+---
 
-## Доступ
-
-| Назначение | URL |
-|------------|-----|
-| Frontend SPA | http://tr.test.boldyrev.techart.intranet |
-| API | http://tr.test.boldyrev.techart.intranet/api |
-| Admin Panel | http://tr.test.boldyrev.techart.intranet/admin |
-
-## Тестовые данные
+## Тестовые пользователи
 
 | Роль | Email | Пароль |
-|------|-------|--------|
-| Администратор (SPA) | admin@example.com | password |
-| Пользователь | test@example.com | password |
-| Администратор (MoonShine) | создаётся через `artisan moonshine:user` | — |
+|---|---|---|
+| **Администратор** | `admin@example.com` | `password` |
+| **Пользователь** | `test@example.com` | `password` |
+
+- **Admin** видит все задачи пользователей, может редактировать/удалять любые
+- **User** видит только свои задачи
+
+---
+
+## Docker
+
+```bash
+# Запуск всех сервисов
+docker compose up --build
+```
+
+- Backend: **http://localhost:8000**
+- Frontend: **http://localhost:5173**
+
+---
 
 ## API Endpoints
 
-| Метод | Endpoint | Описание |
-|-------|----------|----------|
-| POST | /api/auth/login | Вход |
-| POST | /api/auth/logout | Выход |
-| GET | /api/user | Текущий пользователь |
-| GET | /api/tasks | Список задач (пагинация, сортировка, фильтр, поиск) |
-| POST | /api/tasks | Создать задачу |
-| GET | /api/tasks/{id} | Получить задачу |
-| PUT | /api/tasks/{id} | Обновить задачу |
-| DELETE | /api/tasks/{id} | Удалить задачу |
+Все endpoints возвращают JSON. Авторизованные запросы требуют заголовок:
 
-### Параметры запроса GET /api/tasks
+```
+Authorization: Bearer <token>
+```
 
-- `page` — номер страницы
-- `per_page` — элементов на странице (по умолч. 10, макс. 50)
-- `sort_by` — поле сортировки (`due_date`, `status`)
-- `filter_by_status` — фильтр по статусу
-- `search` — поиск по названию
-- `owner_filter` — фильтр владельца для админа (`mine`, `others`)
+### Auth
+
+| Method | Path | Доступ | Описание |
+|---|---|---|---|
+| `POST` | `/api/auth/login` | public | Вход, получение Bearer-токена |
+| `POST` | `/api/auth/logout` | auth | Завершение сессии |
+| `GET` | `/api/user` | auth | Текущий пользователь |
+| `PUT` | `/api/user` | auth | Обновление профиля (имя, email, пароль) |
+
+### Tasks
+
+| Method | Path | Доступ | Описание |
+|---|---|---|---|
+| `GET` | `/api/tasks` | auth | Список задач (с пагинацией, фильтрацией, поиском) |
+| `POST` | `/api/tasks` | auth | Создание задачи |
+| `GET` | `/api/tasks/{id}` | auth | Получение задачи |
+| `PUT/PATCH` | `/api/tasks/{id}` | owner/admin | Редактирование задачи |
+| `DELETE` | `/api/tasks/{id}` | owner/admin | Удаление задачи |
+
+### Параметры GET /api/tasks
+
+| Параметр | Тип | Описание |
+|---|---|---|
+| `page` | integer | Номер страницы |
+| `per_page` | integer (max 50) | Задач на странице |
+| `sort_by` | `due_date` / `status` | Сортировка |
+| `filter_by_status` | `pending` / `in_progress` / `completed` | Фильтр по статусу |
+| `search` | string | Поиск по названию |
+| `owner_filter` | `mine` / `others` | Фильтр по владельцу (только admin) |
+
+### Формат ответов
+
+**Успех (200/201):**
+```json
+{
+  "data": { ... },
+  "meta": { "total": 12, "per_page": 10, "current_page": 1, "last_page": 2 }
+}
+```
+
+**Ошибки:**
+
+| Код | Описание |
+|---|---|
+| `401` | `{"message": "Не авторизован.", "errors": {...}}` |
+| `403` | `{"message": "Доступ запрещён.", "errors": {...}}` |
+| `404` | `{"message": "Не найдено.", "errors": {...}}` |
+| `422` | `{"message": "Ошибка валидации.", "errors": {...}}` |
+| `500` | `{"message": "Внутренняя ошибка сервера.", "errors": {...}}` |
+
+---
+
+## Swagger
+
+Документация API в формате OpenAPI 3.0:
+
+- **Spec**: `/swagger.json`
+- **UI**: http://localhost:8000/api/documentation
+
+---
+
+## Auth-подход
+
+Используется **Laravel Sanctum** в режиме Bearer Token:
+
+1. При логине (`POST /api/auth/login`) сервер возвращает `plainTextToken` и данные пользователя
+2. Токен сохраняется в **localStorage** браузера
+3. Каждый запрос к API отправляется с заголовком `Authorization: Bearer <token>`
+4. При ответе 401 — токен удаляется, пользователь перенаправляется на страницу входа
+5. Sanctum не использует куки и CSRF — подходит для SPA на отдельном домене/порте
+
+---
 
 ## Структура проекта
 
 ```
-├── backend/          # Laravel API + MoonShine
+todo-list/
+├── backend/                        # Laravel API
 │   ├── app/
-│   │   ├── Http/Controllers/Api/   # AuthController, TaskController
-│   │   ├── Http/Requests/           # TaskStoreRequest, TaskUpdateRequest
-│   │   ├── Models/                  # User, Task
-│   │   ├── Policies/                # TaskPolicy
-│   │   └── MoonShine/               # Dashboard, Resources (User, Task)
+│   │   ├── Exceptions/             # Обработка ошибок (401, 403, 404, 422, 500)
+│   │   ├── Http/
+│   │   │   ├── Controllers/Api/    # AuthController, TaskController
+│   │   │   └── Requests/           # TaskStoreRequest, TaskUpdateRequest
+│   │   ├── Models/                 # User, Task
+│   │   ├── Policies/               # TaskPolicy (owner/admin)
+│   │   └── Providers/              # AppServiceProvider
+│   ├── config/                     # moonshine.php, auth.php, sanctum.php
 │   ├── database/
-│   │   ├── migrations/
-│   │   ├── seeders/                 # UserSeeder, TaskSeeder
-│   │   └── factories/               # UserFactory, TaskFactory
-│   └── routes/
-│       ├── api.php
-│       └── web.php
-├── frontend/         # Nuxt 4 SPA
-│   ├── pages/                      # login.vue, dashboard.vue
-│   ├── components/                 # TaskList, TaskForm, TaskItem, TaskFilters
-│   ├── composables/                # useAuth, useTasks
-│   └── middleware/                 # auth.js
+│   │   ├── factories/              # UserFactory, TaskFactory
+│   │   ├── migrations/             # users, tasks, personal_access_tokens
+│   │   └── seeders/                # UserSeeder, TaskSeeder
+│   ├── lang/ru/                    # Русские сообщения валидации
+│   ├── routes/
+│   │   └── api.php                 # 8 endpoints
+│   ├── public/
+│   │   └── swagger.json            # OpenAPI 3.0 спецификация
+│   └── tests/Feature/              # ApiTest (16 тестов)
+│
+├── frontend/                       # Nuxt 4 SPA
+│   ├── assets/css/                 # main.css (глобальные стили, BEM, responsive)
+│   ├── components/
+│   │   ├── AppSelect.vue           # Кастомный селект с BEM
+│   │   ├── ConfirmDialog.vue       # Модалка подтверждения
+│   │   ├── ProfileForm.vue         # Редактирование профиля
+│   │   ├── TaskFilters.vue         # Фильтры, сортировка, поиск
+│   │   ├── TaskForm.vue            # Создание/редактирование задачи (модалка)
+│   │   ├── TaskItem.vue            # Карточка задачи с статус-меню
+│   │   └── TaskList.vue            # Список + скелетон + пустое состояние
+│   ├── composables/
+│   │   ├── useAuth.js              # Логин, логаут, обновление профиля
+│   │   ├── useStickyButton.js      # Sticky-кнопка в шапке
+│   │   └── useTasks.js             # CRUD задач
+│   ├── layouts/
+│   │   └── default.vue             # Шапка с пользователем + sticky-кнопка
+│   ├── middleware/
+│   │   └── auth.js                 # Route guard (редирект на /login)
+│   ├── pages/
+│   │   ├── [...slug].vue           # 404 catch-all
+│   │   ├── dashboard.vue           # Главная страница с задачами
+│   │   ├── error.vue               # Глобальная страница ошибки (404)
+│   │   ├── index.vue               # Редирект на /login
+│   │   └── login.vue               # Страница входа
+│   ├── plugins/
+│   │   └── pwa.client.ts           # Регистрация Service Worker
+│   ├── public/
+│   │   ├── favicon.svg             # Фавиконка
+│   │   ├── icons/icon.svg          # PWA иконка 512×512
+│   │   ├── manifest.json           # PWA манифест
+│   │   └── sw.js                   # Service Worker (NetworkFirst для API)
+│   └── tests/                      # 16 тестов
+│       ├── auth.test.ts
+│       ├── task-form.test.ts
+│       └── task-item.test.ts
+│
+├── docker-compose.yml
 └── README.md
 ```
+
+---
+
+## Тестирование
+
+### Backend (16 тестов)
+
+```bash
+cd backend
+php artisan test
+```
+
+Проверяет: логин, CRUD задач, права доступа (owner/admin), валидацию, 401 без токена.
+
+### Frontend (16 тестов)
+
+```bash
+cd frontend
+npm run test
+```
+
+Проверяет: TaskForm (режимы, валидация, эмиты), TaskItem (отображение, права доступа), Auth (localStorage).
+
+---
+
+## Дополнительные возможности
+
+### Реализовано
+
+- [x] Разделение ролей admin/user
+- [x] Скрытие кнопок редактирования/удаления при отсутствии прав
+- [x] Поиск с debounce (400ms) + синхронизация с query-параметрами URL
+- [x] Пагинация (backend + frontend, скрытие при 1 странице)
+- [x] Feature-тесты API (16 тестов)
+- [x] Компонентные frontend-тесты (16 тестов)
+- [x] OpenAPI 3.0 спецификация + Swagger UI
+- [x] Docker Compose
+- [x] Адаптив (4 брейкпоинта: 360–768–1024–1640–1920)
+- [x] BEM-методология в CSS
+- [x] Редактирование профиля (имя, email, пароль)
+- [x] Цветные плашки дедлайна (красный/жёлтый/зелёный)
+- [x] Показ дней до дедлайна
+- [x] Кастомные скроллы
+- [x] Русские сообщения валидации и ошибок API
+- [x] Анимации (модалки, тултипы статуса, hover-эффекты)
+
+
+
+---
+
+<div align="center">
+  <br>
+  <p>Разработано в рамках тестового задания</p>
+  <br>
+</div>

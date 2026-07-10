@@ -22,41 +22,41 @@ use MoonShine\Support\ListOf;
 #[Order(1)]
 class MoonShineUserRoleResource extends ModelResource
 {
-    protected string $model = MoonshineUserRole::class;
+	protected string $model = MoonshineUserRole::class;
 
-    protected string $column = 'name';
+	protected string $column = 'name';
 
-    protected bool $createInModal = true;
+	protected bool $createInModal = true;
 
-    protected bool $detailInModal = true;
+	protected bool $detailInModal = true;
 
-    protected bool $editInModal = true;
+	protected bool $editInModal = true;
 
-    protected bool $cursorPaginate = true;
+	protected bool $cursorPaginate = true;
 
-    public function getTitle(): string
-    {
-        return __('moonshine::ui.resource.role');
-    }
+	public function getTitle(): string
+	{
+		return __('moonshine::ui.resource.role');
+	}
 
-    protected function activeActions(): ListOf
-    {
-        return parent::activeActions()->except(Action::VIEW);
-    }
+	protected function activeActions(): ListOf
+	{
+		return parent::activeActions()->except(Action::VIEW);
+	}
 
-    protected function pages(): array
-    {
-        return [
-            MoonShineUserRoleIndexPage::class,
-            MoonShineUserRoleFormPage::class,
-        ];
-    }
+	protected function pages(): array
+	{
+		return [
+			MoonShineUserRoleIndexPage::class,
+			MoonShineUserRoleFormPage::class,
+		];
+	}
 
-    protected function search(): array
-    {
-        return [
-            'id',
-            'name',
-        ];
-    }
+	protected function search(): array
+	{
+		return [
+			'id',
+			'name',
+		];
+	}
 }

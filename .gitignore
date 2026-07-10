@@ -1,0 +1,35 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.code-workspace
+.nova/
+.zed/
+.cursor/
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Backend
+/backend/vendor/
+/backend/node_modules/
+/backend/storage/*.key
+/backend/storage/pail
+/backend/public/build
+/backend/public/hot
+/backend/public/storage
+/backend/.phpunit.cache/
+/backend/.phpunit.result.cache
+/backend/_ide_helper.php
+
+# Frontend
+/frontend/node_modules/
+/frontend/.nuxt/
+/frontend/.output/
+/frontend/dist/

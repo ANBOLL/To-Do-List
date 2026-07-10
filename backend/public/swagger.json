@@ -1,0 +1,832 @@
+{
+	"openapi": "3.0.3",
+	"info": {
+		"title": "To-Do List API",
+		"description": "REST API для управления задачами. Laravel + Sanctum Bearer Token.",
+		"version": "1.1.0"
+	},
+	"servers": [
+		{
+			"url": "http://localhost:8000",
+			"description": "Local development"
+		}
+	],
+	"components": {
+		"securitySchemes": {
+			"bearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "sanctum"
+			}
+		},
+		"schemas": {
+			"User": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"name": {
+						"type": "string",
+						"example": "Admin User"
+					},
+					"email": {
+						"type": "string",
+						"example": "admin@example.com"
+					},
+					"role": {
+						"type": "string",
+						"enum": [
+							"user",
+							"admin"
+						],
+						"example": "admin"
+					},
+					"is_admin": {
+						"type": "boolean",
+						"example": true
+					}
+				}
+			},
+			"Task": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"user_id": {
+						"type": "integer",
+						"example": 1
+					},
+					"title": {
+						"type": "string",
+						"example": "Form Request validation"
+					},
+					"description": {
+						"type": "string",
+						"nullable": true,
+						"example": "Добавить валидацию"
+					},
+					"due_date": {
+						"type": "string",
+						"format": "date",
+						"nullable": true,
+						"example": "2026-07-14"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"pending",
+							"in_progress",
+							"completed"
+						],
+						"example": "in_progress"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updated_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"user": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "integer"
+							},
+							"email": {
+								"type": "string",
+								"example": "user@example.com"
+							},
+							"is_admin": {
+								"type": "boolean"
+							}
+						}
+					}
+				}
+			},
+			"TaskData": {
+				"type": "object",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/Task"
+					}
+				}
+			},
+			"TaskList": {
+				"type": "object",
+				"properties": {
+					"data": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Task"
+						}
+					},
+					"meta": {
+						"type": "object",
+						"properties": {
+							"total": {
+								"type": "integer",
+								"example": 12
+							},
+							"per_page": {
+								"type": "integer",
+								"example": 10
+							},
+							"current_page": {
+								"type": "integer",
+								"example": 1
+							},
+							"last_page": {
+								"type": "integer",
+								"example": 2
+							}
+						}
+					}
+				}
+			},
+			"LoginRequest": {
+				"type": "object",
+				"required": [
+					"email",
+					"password"
+				],
+				"properties": {
+					"email": {
+						"type": "string",
+						"format": "email",
+						"example": "admin@example.com"
+					},
+					"password": {
+						"type": "string",
+						"format": "password",
+						"example": "password"
+					}
+				}
+			},
+			"LoginResponse": {
+				"type": "object",
+				"properties": {
+					"user": {
+						"$ref": "#/components/schemas/User"
+					},
+					"token": {
+						"type": "string",
+						"example": "1|abc123..."
+					}
+				}
+			},
+			"TaskStoreRequest": {
+				"type": "object",
+				"required": [
+					"title",
+					"status"
+				],
+				"properties": {
+					"title": {
+						"type": "string",
+						"minLength": 3,
+						"maxLength": 255,
+						"example": "New Task"
+					},
+					"description": {
+						"type": "string",
+						"nullable": true,
+						"example": "Task description"
+					},
+					"due_date": {
+						"type": "string",
+						"format": "date",
+						"nullable": true,
+						"example": "2026-07-20"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"pending",
+							"in_progress",
+							"completed"
+						],
+						"example": "pending"
+					}
+				}
+			},
+			"ProfileUpdateRequest": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string",
+						"example": "John Doe",
+						"description": "Новое имя (опционально)"
+					},
+					"email": {
+						"type": "string",
+						"format": "email",
+						"example": "new@example.com",
+						"description": "Новый email (опционально, проверка уникальности)"
+					},
+					"password": {
+						"type": "string",
+						"format": "password",
+						"minLength": 6,
+						"example": "newpass",
+						"description": "Новый пароль (опционально)"
+					}
+				}
+			},
+			"ProfileUpdateResponse": {
+				"type": "object",
+				"properties": {
+					"user": {
+						"$ref": "#/components/schemas/User"
+					},
+					"message": {
+						"type": "string",
+						"example": "Профиль обновлён."
+					}
+				}
+			},
+			"MessageResponse": {
+				"type": "object",
+				"properties": {
+					"message": {
+						"type": "string",
+						"example": "Task deleted successfully."
+					}
+				}
+			},
+			"ErrorResponse": {
+				"type": "object",
+				"properties": {
+					"message": {
+						"type": "string"
+					},
+					"errors": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"paths": {
+		"/api/auth/login": {
+			"post": {
+				"tags": [
+					"Auth"
+				],
+				"summary": "Авторизация пользователя",
+				"description": "Возвращает Bearer-токен и данные пользователя.",
+				"operationId": "login",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/LoginRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Успешный вход",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LoginResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Ошибка валидации или неверные учётные данные",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/auth/logout": {
+			"post": {
+				"tags": [
+					"Auth"
+				],
+				"summary": "Выход из системы",
+				"description": "Инвалидация текущего токена.",
+				"operationId": "logout",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Успешный выход",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Logged out successfully."
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Не авторизован",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/user": {
+			"get": {
+				"tags": [
+					"Auth"
+				],
+				"summary": "Текущий пользователь",
+				"description": "Возвращает данные авторизованного пользователя.",
+				"operationId": "user",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Данные пользователя",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"user": {
+											"$ref": "#/components/schemas/User"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Не авторизован",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"tags": [
+					"Auth"
+				],
+				"summary": "Обновление профиля",
+				"description": "Обновление имени, email и/или пароля текущего пользователя. Email проверяется на уникальность.",
+				"operationId": "updateUser",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ProfileUpdateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Профиль обновлён",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ProfileUpdateResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Не авторизован",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Ошибка валидации",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/tasks": {
+			"get": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Список задач",
+				"description": "Сортировка, фильтрация по статусу, поиск по названию, фильтр владельца (только admin) и пагинация.",
+				"operationId": "tasksIndex",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "page",
+						"in": "query",
+						"schema": {
+							"type": "integer"
+						},
+						"description": "Номер страницы"
+					},
+					{
+						"name": "per_page",
+						"in": "query",
+						"schema": {
+							"type": "integer",
+							"maximum": 50
+						},
+						"description": "Задач на странице"
+					},
+					{
+						"name": "sort_by",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"enum": [
+								"due_date",
+								"status"
+							]
+						},
+						"description": "Сортировка"
+					},
+					{
+						"name": "filter_by_status",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"enum": [
+								"pending",
+								"in_progress",
+								"completed"
+							]
+						},
+						"description": "Фильтр по статусу"
+					},
+					{
+						"name": "search",
+						"in": "query",
+						"schema": {
+							"type": "string"
+						},
+						"description": "Поиск по названию"
+					},
+					{
+						"name": "owner_filter",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"enum": [
+								"mine",
+								"others"
+							]
+						},
+						"description": "Фильтр владельца (только admin)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Список задач",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TaskList"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Не авторизован",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Создание задачи",
+				"operationId": "tasksStore",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TaskStoreRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Задача создана",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TaskData"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Не авторизован",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Ошибка валидации",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/tasks/{id}": {
+			"get": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Получение задачи",
+				"operationId": "tasksShow",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Данные задачи",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TaskData"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Не авторизован",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Нет доступа",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Не найдено",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Редактирование задачи",
+				"operationId": "tasksUpdate",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TaskStoreRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Задача обновлена",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TaskData"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Не авторизован",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Нет доступа",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Не найдено",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Ошибка валидации",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Удаление задачи",
+				"operationId": "tasksDestroy",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Задача удалена",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Не авторизован",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Нет доступа",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Не найдено",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

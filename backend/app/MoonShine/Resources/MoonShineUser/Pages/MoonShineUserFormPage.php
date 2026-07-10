@@ -34,78 +34,78 @@ use MoonShine\UI\Fields\Text;
  */
 final class MoonShineUserFormPage extends FormPage
 {
-    /**
-     * @return list<ComponentContract|FieldContract>
-     */
-    protected function fields(): iterable
-    {
-        return [
-            Box::make([
-                Tabs::make([
-                    Tab::make(__('moonshine::ui.resource.main_information'), [
-                        ID::make(),
+	/**
+	 * @return list<ComponentContract|FieldContract>
+	 */
+	protected function fields(): iterable
+	{
+		return [
+			Box::make([
+				Tabs::make([
+					Tab::make(__('moonshine::ui.resource.main_information'), [
+						ID::make(),
 
-                        BelongsTo::make(
-                            __('moonshine::ui.resource.role'),
-                            'moonshineUserRole',
-                            formatted: static fn (MoonshineUserRole $model) => $model->name,
-                            resource: MoonShineUserRoleResource::class,
-                        )
-                            ->creatable()
-                            ->valuesQuery(static fn (Builder $q) => $q->select(['id', 'name'])),
+						BelongsTo::make(
+							__('moonshine::ui.resource.role'),
+							'moonshineUserRole',
+							formatted: static fn(MoonshineUserRole $model) => $model->name,
+							resource: MoonShineUserRoleResource::class,
+						)
+							->creatable()
+							->valuesQuery(static fn(Builder $q) => $q->select(['id', 'name'])),
 
-                        Flex::make([
-                            Text::make(__('moonshine::ui.resource.name'), 'name')
-                                ->required(),
+						Flex::make([
+							Text::make(__('moonshine::ui.resource.name'), 'name')
+								->required(),
 
-                            Email::make(__('moonshine::ui.resource.email'), 'email')
-                                ->required(),
-                        ]),
+							Email::make(__('moonshine::ui.resource.email'), 'email')
+								->required(),
+						]),
 
-                        Image::make(__('moonshine::ui.resource.avatar'), 'avatar')
-                            ->disk(moonshineConfig()->getDisk())
-                            ->dir(moonshineConfig()->getUserAvatarsDir())
-                            ->allowedExtensions(['jpg', 'png', 'jpeg', 'gif']),
+						Image::make(__('moonshine::ui.resource.avatar'), 'avatar')
+							->disk(moonshineConfig()->getDisk())
+							->dir(moonshineConfig()->getUserAvatarsDir())
+							->allowedExtensions(['jpg', 'png', 'jpeg', 'gif']),
 
-                        Date::make(__('moonshine::ui.resource.created_at'), 'created_at')
-                            ->format("d.m.Y")
-                            ->default(now()->toDateTimeString()),
-                    ])->icon('user-circle'),
+						Date::make(__('moonshine::ui.resource.created_at'), 'created_at')
+							->format("d.m.Y")
+							->default(now()->toDateTimeString()),
+					])->icon('user-circle'),
 
-                    Tab::make(__('moonshine::ui.resource.password'), [
-                        Collapse::make(__('moonshine::ui.resource.change_password'), [
-                            Password::make(__('moonshine::ui.resource.password'), 'password')
-                                ->customAttributes(['autocomplete' => 'new-password'])
-                                ->eye(),
+					Tab::make(__('moonshine::ui.resource.password'), [
+						Collapse::make(__('moonshine::ui.resource.change_password'), [
+							Password::make(__('moonshine::ui.resource.password'), 'password')
+								->customAttributes(['autocomplete' => 'new-password'])
+								->eye(),
 
-                            PasswordRepeat::make(__('moonshine::ui.resource.repeat_password'), 'password_confirmation')
-                                ->customAttributes(['autocomplete' => 'confirm-password'])
-                                ->eye(),
-                        ])->icon('lock-closed'),
-                    ])->icon('lock-closed'),
-                ]),
-            ]),
-        ];
-    }
+							PasswordRepeat::make(__('moonshine::ui.resource.repeat_password'), 'password_confirmation')
+								->customAttributes(['autocomplete' => 'confirm-password'])
+								->eye(),
+						])->icon('lock-closed'),
+					])->icon('lock-closed'),
+				]),
+			]),
+		];
+	}
 
-    protected function rules(DataWrapperContract $item): array
-    {
-        return [
-            'name' => 'required',
-            'moonshine_user_role_id' => 'required',
-            'email' => [
-                'sometimes',
-                'bail',
-                'required',
-                'email',
-                Rule::unique($item->getOriginal()::class)->ignoreModel($item->getOriginal()),
-            ],
-            'avatar' => ['sometimes', 'nullable', 'image', 'mimes:jpeg,jpg,png,gif'],
-            'password' => [
-                ...$item->getKey() !== null ? ['sometimes', 'nullable'] : ['required'],
-                PasswordRule::defaults(),
-                'confirmed',
-            ],
-        ];
-    }
+	protected function rules(DataWrapperContract $item): array
+	{
+		return [
+			'name' => 'required',
+			'moonshine_user_role_id' => 'required',
+			'email' => [
+				'sometimes',
+				'bail',
+				'required',
+				'email',
+				Rule::unique($item->getOriginal()::class)->ignoreModel($item->getOriginal()),
+			],
+			'avatar' => ['sometimes', 'nullable', 'image', 'mimes:jpeg,jpg,png,gif'],
+			'password' => [
+				...$item->getKey() !== null ? ['sometimes', 'nullable'] : ['required'],
+				PasswordRule::defaults(),
+				'confirmed',
+			],
+		];
+	}
 }

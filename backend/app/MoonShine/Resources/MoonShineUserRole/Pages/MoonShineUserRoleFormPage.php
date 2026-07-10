@@ -19,24 +19,24 @@ use MoonShine\UI\Fields\Text;
  */
 final class MoonShineUserRoleFormPage extends FormPage
 {
-    /**
-     * @return list<ComponentContract|FieldContract>
-     */
-    protected function fields(): iterable
-    {
-        return [
-            Box::make([
-                ID::make(),
-                Text::make(__('moonshine::ui.resource.role_name'), 'name')
-                    ->required(),
-            ]),
-        ];
-    }
+	/**
+	 * @return list<ComponentContract|FieldContract>
+	 */
+	protected function fields(): iterable
+	{
+		return [
+			Box::make([
+				ID::make(),
+				Text::make(__('moonshine::ui.resource.role_name'), 'name')
+					->required(),
+			]),
+		];
+	}
 
-    protected function rules(DataWrapperContract $item): array
-    {
-        return [
-            'name' => ['required', 'min:5'],
-        ];
-    }
+	protected function rules(DataWrapperContract $item): array
+	{
+		return [
+			'name' => ['required', 'min:5'],
+		];
+	}
 }

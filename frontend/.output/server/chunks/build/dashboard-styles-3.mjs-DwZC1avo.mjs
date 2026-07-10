@@ -1,4 +1,0 @@
-const TaskList_vue_vue_type_style_index_0_scoped_95408fc7_lang = ".loading-state[data-v-95408fc7]{text-align:center;padding:40px;color:var(--color-text-secondary)}.loading-state p[data-v-95408fc7]{margin-top:12px}.task-list[data-v-95408fc7]{display:flex;flex-direction:column;gap:8px}";
-
-export { TaskList_vue_vue_type_style_index_0_scoped_95408fc7_lang as T };
-//# sourceMappingURL=dashboard-styles-3.mjs-DwZC1avo.mjs.map

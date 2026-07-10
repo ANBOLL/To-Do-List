@@ -18,38 +18,38 @@ use App\MoonShine\Resources\MoonShineUserRole\MoonShineUserRoleResource;
 
 final class MoonShineLayout extends AppLayout
 {
-    /**
-     * @var null|class-string<PaletteContract>
-     */
-    protected ?string $palette = PurplePalette::class;
+	/**
+	 * @var null|class-string<PaletteContract>
+	 */
+	protected ?string $palette = PurplePalette::class;
 
-    protected function assets(): array
-    {
-        return [
-            ...parent::assets(),
-        ];
-    }
+	protected function assets(): array
+	{
+		return [
+			...parent::assets(),
+		];
+	}
 
-    protected function menu(): array
-    {
-        return [
-            MenuGroup::make('Управление', [
-                MenuItem::make(UserResource::class, 'Пользователи'),
-                MenuItem::make(TaskResource::class, 'Задачи'),
-            ]),
+	protected function menu(): array
+	{
+		return [
+			MenuGroup::make('Управление', [
+				MenuItem::make(UserResource::class, 'Пользователи'),
+				MenuItem::make(TaskResource::class, 'Задачи'),
+			]),
 
-            MenuGroup::make('Система', [
-                MenuItem::make(MoonShineUserResource::class),
-                MenuItem::make(MoonShineUserRoleResource::class),
-            ]),
-        ];
-    }
+			MenuGroup::make('Система', [
+				MenuItem::make(MoonShineUserResource::class),
+				MenuItem::make(MoonShineUserRoleResource::class),
+			]),
+		];
+	}
 
-    /**
-     * @param ColorManager $colorManager
-     */
-    protected function colors(ColorManagerContract $colorManager): void
-    {
-        parent::colors($colorManager);
-    }
+	/**
+	 * @param ColorManager $colorManager
+	 */
+	protected function colors(ColorManagerContract $colorManager): void
+	{
+		parent::colors($colorManager);
+	}
 }
