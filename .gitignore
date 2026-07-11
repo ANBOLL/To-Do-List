@@ -24,6 +24,8 @@ Thumbs.db
 /backend/public/build
 /backend/public/hot
 /backend/public/storage
+/backend/public/vendor/
+/backend/lang/vendor/
 /backend/.phpunit.cache/
 /backend/.phpunit.result.cache
 /backend/_ide_helper.php

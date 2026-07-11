@@ -25,16 +25,14 @@ export default defineNuxtConfig({
 			apiBase: process.env.NUXT_PUBLIC_API_BASE || "/api",
 		},
 	},
-	nitro: {
-		devProxy: {
-			"/api": {
-				target: process.env.API_PROXY_TARGET || "http://localhost:8000/api",
-			},
-		},
-	},
 	vite: {
 		server: {
 			origin: "http://localhost:8000",
+			proxy: {
+				"/api": {
+					target: process.env.API_PROXY_TARGET || "http://localhost:8000",
+				},
+			},
 		},
 	},
 	compatibilityDate: "2026-07-10",

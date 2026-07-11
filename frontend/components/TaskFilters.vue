@@ -1,7 +1,7 @@
 <template>
 	<div class="b-task-filters card">
 		<div class="b-task-filters__row">
-			<input :value="search" class="input" placeholder="Поиск по названию..."
+			<input :value="search" class="input" placeholder="Поиск по названию, описанию, владельцу..."
 				@input="$emit('update:search', $event.target.value)" />
 			<AppSelect :modelValue="statusFilter" :options="statusOptions"
 				@update:modelValue="$emit('update:statusFilter', $event)" />

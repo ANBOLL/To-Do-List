@@ -87,7 +87,7 @@ npm run dev
 ```
 
 Frontend будет доступен на **http://localhost:5173**.  
-В dev-режиме `.env` не требуется — запросы к API проксируются через Nitro.
+В dev-режиме `.env` не требуется — запросы к API проксируются через Vite (`vite.server.proxy` в `nuxt.config.ts`).
 
 ---
 
@@ -105,13 +105,82 @@ Frontend будет доступен на **http://localhost:5173**.
 
 ## Docker
 
-```bash
-# Запуск всех сервисов
-docker compose up --build
-```
-
 - Backend: **http://localhost:8000**
 - Frontend: **http://localhost:5173**
+
+### Docker + SQLite (по умолчанию)
+
+```bash
+docker compose up -d
+docker compose exec app php artisan migrate --seed
+```
+
+### Docker + MySQL
+
+Раскомментировать MySQL-блок в `docker-compose.yml` и добавить сервис MySQL:
+
+```yaml
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: todo-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: todo_app_test
+    ports:
+      - "3307:3306"
+    networks:
+      - todo-network
+```
+
+После чего в блоке `app` → `environment` раскомментировать MySQL:
+
+```yaml
+- DB_CONNECTION=mysql
+- DB_HOST=mysql
+- DB_PORT=3306
+- DB_DATABASE=todo_app_test
+- DB_USERNAME=root
+- DB_PASSWORD=root
+```
+
+Запуск:
+
+```bash
+docker compose up -d
+docker compose exec app php artisan migrate --seed
+```
+
+### Local (без Docker)
+
+Настройки БД в файле `backend/.env`. Docker не влияет.
+
+**SQLite:**
+```bash
+cd backend
+cp .env.example .env
+# в .env раскомментировать SQLite-блок, закомментировать MySQL
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve
+```
+
+**MySQL:**
+```bash
+cd backend
+cp .env.example .env
+# в .env раскомментировать MySQL-блок, закомментировать SQLite
+# предварительно создать БД todo_app_test
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve
+```
+
+### Особенности Docker-окружения
+
+- **Прокси**: `/api/*` запросы проксируются через `vite.server.proxy` (не `nitro.devProxy` — удалён в Nuxt 4)
+- **OPcache**: сконфигурирован с `revalidate_freq=30` для ускорения на Windows bind mount (`backend/docker-php-ext-opcache.ini`)
+- **Скорость**: `SESSION_DRIVER=file`, `CACHE_STORE=file` — чтобы не дёргать SQLite на каждый запрос
 
 ---
 
@@ -223,6 +292,7 @@ todo-list/
 │   ├── public/
 │   │   └── swagger.json            # OpenAPI 3.0 спецификация
 │   ├── tests/Feature/              # ApiTest (16 тестов)
+│   ├── docker-php-ext-opcache.ini  # OPcache для Docker
 │   ├── Dockerfile
 │   └── nginx.conf
 │
@@ -298,6 +368,15 @@ npm run test
 - **Управление**: пользователи (приложения), задачи, администраторы, роли
 
 MoonShine использует отдельную таблицу администраторов `moonshine_users`, не связанную с обычными пользователями приложения.
+
+### Установка ассетов MoonShine
+
+Ассеты MoonShine (`public/vendor/`, `lang/vendor/`) не хранятся в Git. После `composer install` нужно опубликовать их:
+
+```bash
+cd backend
+php artisan vendor:publish --provider="MoonShine\Laravel\Providers\MoonShineServiceProvider" --force
+```
 
 ### Создание администратора
 

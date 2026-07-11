@@ -29,7 +29,15 @@ class TaskController extends Controller
 		}
 
 		if ($request->filled('search')) {
-			$query->where('title', 'like', '%' . $request->search . '%');
+			$searchTerm = '%' . $request->search . '%';
+			$query->where(function ($q) use ($searchTerm, $request) {
+				$q->where('title', 'like', $searchTerm)
+					->orWhere('description', 'like', $searchTerm);
+
+				if ($request->user()->isAdmin()) {
+					$q->orWhereHas('user', fn($u) => $u->where('name', 'like', $searchTerm));
+				}
+			});
 		}
 
 		if ($request->filled('filter_by_status')) {
