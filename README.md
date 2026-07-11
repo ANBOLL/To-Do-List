@@ -39,7 +39,7 @@
 
 | Компонент | Технология |
 |---|---|
-| **Backend** | Laravel 11, PHP 8.3+, Eloquent ORM |
+| **Backend** | Laravel 13, PHP 8.4+, Eloquent ORM |
 | **Frontend** | Nuxt 4, Vue 3 Composition API, Vite |
 | **База данных** | SQLite (по умолчанию) / MySQL |
 | **Авторизация** | Laravel Sanctum (Bearer Token) |
@@ -82,11 +82,12 @@ cd frontend
 # Установка зависимостей
 npm install
 
-# Запуск dev-сервера
+# Запуск dev-сервера (прокси на backend настроен в nuxt.config.ts)
 npm run dev
 ```
 
-Frontend будет доступен на **http://localhost:5173**.
+Frontend будет доступен на **http://localhost:5173**.  
+В dev-режиме `.env` не требуется — запросы к API проксируются через Nitro.
 
 ---
 
@@ -147,7 +148,8 @@ Authorization: Bearer <token>
 |---|---|---|
 | `page` | integer | Номер страницы |
 | `per_page` | integer (max 50) | Задач на странице |
-| `sort_by` | `due_date` / `status` | Сортировка |
+| `sort_by` | `created_at` / `due_date` / `status` | Поле сортировки |
+| `sort_direction` | `asc` / `desc` | Направление сортировки (по умолчанию `asc`) |
 | `filter_by_status` | `pending` / `in_progress` / `completed` | Фильтр по статусу |
 | `search` | string | Поиск по названию |
 | `owner_filter` | `mine` / `others` | Фильтр по владельцу (только admin) |
@@ -166,11 +168,11 @@ Authorization: Bearer <token>
 
 | Код | Описание |
 |---|---|
-| `401` | `{"message": "Не авторизован.", "errors": {...}}` |
-| `403` | `{"message": "Доступ запрещён.", "errors": {...}}` |
-| `404` | `{"message": "Не найдено.", "errors": {...}}` |
-| `422` | `{"message": "Ошибка валидации.", "errors": {...}}` |
-| `500` | `{"message": "Внутренняя ошибка сервера.", "errors": {...}}` |
+| `401` | `{"message": "Не авторизован.", "errors": {...}, "code": 401}` |
+| `403` | `{"message": "Доступ запрещён.", "errors": {...}, "code": 403}` |
+| `404` | `{"message": "Не найдено.", "errors": {...}, "code": 404}` |
+| `422` | `{"message": "Ошибка валидации.", "errors": {...}, "code": 422}` |
+| `500` | `{"message": "Внутренняя ошибка сервера.", "errors": {...}, "code": 500}` |
 
 ---
 
@@ -208,19 +210,21 @@ todo-list/
 │   │   ├── Models/                 # User, Task
 │   │   ├── Policies/               # TaskPolicy (owner/admin)
 │   │   ├── Providers/              # AppServiceProvider, MoonShineServiceProvider
-│   │   └── Enums/                  # TaskStatus, UserRole
-│   ├── config/                     # moonshine.php, auth.php, sanctum.php
+│   │   ├── Enums/                  # TaskStatus, UserRole
+│   │   └── MoonShine/              # Dashboard, Layouts, Resources
+│   ├── config/                     # moonshine.php, auth.php, cors.php
 │   ├── database/
 │   │   ├── factories/              # UserFactory, TaskFactory
 │   │   ├── migrations/             # users, tasks, personal_access_tokens
 │   │   └── seeders/                # UserSeeder, TaskSeeder
 │   ├── lang/ru/                    # Русские сообщения валидации
 │   ├── routes/
-│   │   └── api.php                 # 8 endpoints
+│   │   └── api.php                 # 9 endpoints
 │   ├── public/
 │   │   └── swagger.json            # OpenAPI 3.0 спецификация
 │   ├── tests/Feature/              # ApiTest (16 тестов)
-│   └── Dockerfile
+│   ├── Dockerfile
+│   └── nginx.conf
 │
 ├── frontend/                       # Nuxt 4 SPA
 │   ├── app.vue                     # Корневой компонент
@@ -242,10 +246,10 @@ todo-list/
 │   │   └── default.vue             # Шапка с пользователем + sticky-кнопка
 │   ├── middleware/
 │   │   └── auth.js                 # Route guard (редирект на /login)
+│   ├── error.vue                   # Глобальная страница ошибки
 │   ├── pages/
 │   │   ├── [...slug].vue           # 404 catch-all
 │   │   ├── dashboard.vue           # Главная страница с задачами
-│   │   ├── error.vue               # Глобальная страница ошибки
 │   │   ├── index.vue               # Редирект на /login
 │   │   └── login.vue               # Страница входа
 │   ├── public/

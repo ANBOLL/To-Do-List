@@ -30,7 +30,10 @@ export function useAuth() {
 			}
 			return true
 		} catch (e) {
-			error.value = e.data?.message || 'Login failed'
+			const msg = e.data?.errors
+				? Object.values(e.data.errors).flat().join(', ')
+				: (e.data?.message || 'Ошибка входа')
+			error.value = msg
 			return false
 		} finally {
 			loading.value = false

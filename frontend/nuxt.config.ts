@@ -28,13 +28,13 @@ export default defineNuxtConfig({
 	nitro: {
 		devProxy: {
 			"/api": {
-				target: "http://localhost:8000/api",
+				target: process.env.API_PROXY_TARGET || "http://localhost:8000/api",
 			},
 		},
 	},
 	vite: {
 		server: {
-			origin: "http://localhost:5173",
+			origin: "http://localhost:8000",
 		},
 	},
 	compatibilityDate: "2026-07-10",

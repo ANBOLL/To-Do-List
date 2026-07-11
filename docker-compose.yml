@@ -11,6 +11,7 @@ services:
       - APP_ENV=local
       - APP_DEBUG=true
       - APP_URL=http://localhost:8000
+      - FRONTEND_URL=http://localhost:5173
       - DB_CONNECTION=sqlite
       - DB_DATABASE=/var/www/database/database.sqlite
     networks:
@@ -42,7 +43,8 @@ services:
       - ./frontend:/app
       - /app/node_modules
     environment:
-      - NUXT_PUBLIC_API_BASE=http://localhost:8000/api
+      - NUXT_PUBLIC_API_BASE=/api
+      - API_PROXY_TARGET=http://nginx:80
     depends_on:
       - nginx
     networks:

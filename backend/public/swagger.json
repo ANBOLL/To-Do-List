@@ -102,6 +102,10 @@
 								"type": "string",
 								"example": "user@example.com"
 							},
+							"name": {
+								"type": "string",
+								"example": "Test User"
+							},
 							"is_admin": {
 								"type": "boolean"
 							}
@@ -171,12 +175,17 @@
 			"LoginResponse": {
 				"type": "object",
 				"properties": {
-					"user": {
-						"$ref": "#/components/schemas/User"
-					},
-					"token": {
-						"type": "string",
-						"example": "1|abc123..."
+					"data": {
+						"type": "object",
+						"properties": {
+							"user": {
+								"$ref": "#/components/schemas/User"
+							},
+							"token": {
+								"type": "string",
+								"example": "1|abc123..."
+							}
+						}
 					}
 				}
 			},
@@ -241,7 +250,7 @@
 			"ProfileUpdateResponse": {
 				"type": "object",
 				"properties": {
-					"user": {
+					"data": {
 						"$ref": "#/components/schemas/User"
 					},
 					"message": {
@@ -253,9 +262,12 @@
 			"MessageResponse": {
 				"type": "object",
 				"properties": {
+					"data": {
+						"type": "null"
+					},
 					"message": {
 						"type": "string",
-						"example": "Task deleted successfully."
+						"example": "Задача удалена."
 					}
 				}
 			},
@@ -273,6 +285,10 @@
 								"type": "string"
 							}
 						}
+					},
+					"code": {
+						"type": "integer",
+						"example": 401
 					}
 				}
 			}
@@ -342,6 +358,9 @@
 								"schema": {
 									"type": "object",
 									"properties": {
+										"data": {
+											"type": "null"
+										},
 										"message": {
 											"type": "string",
 											"example": "Logged out successfully."
@@ -383,12 +402,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "object",
-									"properties": {
-										"user": {
-											"$ref": "#/components/schemas/User"
-										}
-									}
+											"type": "object",
+											"properties": {
+												"data": {
+													"$ref": "#/components/schemas/User"
+												}
+											}
 								}
 							}
 						}
@@ -497,11 +516,24 @@
 						"schema": {
 							"type": "string",
 							"enum": [
+								"created_at",
 								"due_date",
 								"status"
 							]
 						},
-						"description": "Сортировка"
+						"description": "Поле сортировки"
+					},
+					{
+						"name": "sort_direction",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"enum": [
+								"asc",
+								"desc"
+							]
+						},
+						"description": "Направление сортировки (по умолчанию asc)"
 					},
 					{
 						"name": "filter_by_status",
